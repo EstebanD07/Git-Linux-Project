@@ -1,0 +1,134 @@
+##Q2
+
+curl - s https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin | grep -Po '"current_price":\K[^,]*'
+
+##Q3
+
+pip install dash
+
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+from dash.dependencies import Input, Output
+import time
+import subprocess
+
+app = dash.Dash(__name__)
+
+app.layout = html.Div([
+    html.H1('Bitcoin Price Dashboard'),
+    html.Div(id = 'price-container', children = 'Loading...'),
+    dcc.Graph(id = 'price-graph'),
+    dcc.Interval(id = 'price-interval', interval = 5000, n_intervals = 0)
+])
+
+@app.callback(
+    [Output('price-container', 'children'), Output('price-graph', 'figure')],
+    [Input('price-interval', 'n_intervals')]
+)
+def update_price(n):
+    price = subprocess.check_output("curl -s https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin | grep -Po '\"current_price\":\\K[^,]*'", shell = True).decode("utf-8").strip()
+    price_str = f"Current Bitcoin price: {price} USD"
+    data = { 'x': [time.strftime('%Y-%m-%d %H:%M:%S')], 'y': [float(price)]}
+return price_str, { 'data': [{ 'type': 'line', 'x': data['x'], 'y': data['y']}], 'layout': { 'title': 'Bitcoin Price over Time'} }
+
+if __name__ == '__main__':
+    app.run_server(debug = True)
+
+##Q4
+
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+from dash.dependencies import Input, Output
+import time
+import subprocess
+
+# Initialize the Dash app and create a layout
+app = dash.Dash(__name__)
+
+app.layout = html.Div([
+    html.H1('Bitcoin Price Dashboard'),
+    html.Div(id = 'price-container', children = 'Loading...'),
+    dcc.Graph(id = 'price-graph'),
+    dcc.Interval(id = 'price-interval', interval = 5000, n_intervals = 0)
+])
+
+# Initialize a list to store the historical prices
+historical_prices = []
+
+# Define a callback function to update the Bitcoin price and graph
+@app.callback(
+    [Output('price-container', 'children'), Output('price-graph', 'figure')],
+    [Input('price-interval', 'n_intervals')]
+)
+def update_price(n):
+    price = subprocess.check_output("curl -s https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin | grep -Po '\"current_price\":\\K[^,]*'", shell = True).decode("utf-8").strip()
+    price_str = f"Current Bitcoin price: {price} USD"
+    historical_prices.append(float(price))
+    data = { 'x': list(range(len(historical_prices))), 'y': historical_prices}
+return price_str, { 'data': [{ 'type': 'line', 'x': data['x'], 'y': data['y']}], 'layout': { 'title': 'Bitcoin Price over Time'} }
+
+if __name__ == '__main__':
+    app.run_server(debug = True)
+
+##Q5
+
+crontab - e
+
+*/ 5 * *** / path / to / python / path / to / dashboard_script.py
+
+##Q6
+
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+from dash.dependencies import Input, Output
+import time
+import subprocess
+import datetime
+
+# Function that retrieves the daily metrics for Bitcoin
+def get_daily_metrics():
+    # Your code here to retrieve the daily metrics
+    return daily_metrics
+
+# Initialize the Dash app and create a layout
+app = dash.Dash(__name__)
+
+app.layout = html.Div([
+    html.H1('Bitcoin Price Dashboard'),
+    html.Div(id = 'price-container', children = 'Loading...'),
+    dcc.Graph(id = 'price-graph'),
+    html.Div(id = 'daily-report', children = 'Loading...'),
+    dcc.Interval(id = 'price-interval', interval = 5000, n_intervals = 0)
+])
+
+# Define a callback function to update the Bitcoin price and graph
+@app.callback(
+    [Output('price-container', 'children'), Output('price-graph', 'figure')],
+    [Input('price-interval', 'n_intervals')]
+)
+def update_price(n):
+    price = subprocess.check_output("curl -s https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin | grep -Po '\"current_price\":\\K[^,]*'", shell = True).decode("utf-8").strip()
+    price_str = f"Current Bitcoin price: {price} USD"
+    data = { 'x': [time.strftime('%Y-%m-%d %H:%M:%S')], 'y': [float(price)]}
+return price_str, { 'data': [{ 'type': 'line', 'x': data['x'], 'y': data['y']}], 'layout': { 'title': 'Bitcoin Price over Time'} }
+
+# Define a callback function to update the daily report at 8pm each day
+@app.callback(
+    Output('daily-report', 'children'),
+    [Input('price-interval', 'n_intervals')]
+)
+def update_daily_report(n):
+    now = datetime.datetime.now()
+    if now.hour == 20 and now.minute == 0:
+        daily_metrics = get_daily_metrics()
+        # Your code here to create the table with the daily metrics and return it as a layout element
+        return daily_report_layout_element
+    else:
+        return 'Daily report will be updated at 8pm'
+
+
+if __name__ == '__main__':
+    app.run_server(debug = True)
